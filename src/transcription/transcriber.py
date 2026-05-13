@@ -46,7 +46,7 @@ class Transcriber:
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
         end = time.perf_counter()
-        print(f"\nInitializing Whisper model took {end - start} seconds")
+        print(f"\nInitializing Whisper model took {end - start:.3f} seconds")
 
     def transcribe(self, audio: np.ndarray) -> str:
         """
@@ -71,7 +71,7 @@ class Transcriber:
         transcript = " ".join(segment.text.strip() for segment in segments)
 
         end = time.perf_counter()
-        print(f"Transcribing took {end - start} seconds")
+        print(f"Transcribing took {end - start:.3f} seconds")
 
         return transcript
     
@@ -97,7 +97,7 @@ class Transcriber:
         print(f"Transcript saved to {filename}")
 
         end = time.perf_counter()
-        print(f"Saving took {end - start} seconds")
+        print(f"Saving took {end - start:.3f} seconds")
 
         return transcript
     

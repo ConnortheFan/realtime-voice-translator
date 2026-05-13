@@ -14,7 +14,7 @@ def main():
     transcription = transcriber.transcribe_and_save(recording)
 
     end = time.perf_counter()
-    print(f"\nProgram took {end - start} seconds")
+    print(f"\nProgram took {end - start:.3f} seconds")
 
 if __name__ == "__main__":
     main()

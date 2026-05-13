@@ -40,7 +40,7 @@ class Recorder:
         self.recording = False
 
         end = time.perf_counter()
-        print(f"\nInitializing Recorder took {end - start} seconds")
+        print(f"\nInitializing Recorder took {end - start:.3f} seconds")
 
     def record(self, duration: float) -> np.ndarray:
         """
@@ -70,7 +70,7 @@ class Recorder:
         # print(f"Audio length: {len(self.audio) / self.sample_rate} seconds")
 
         end = time.perf_counter()
-        print(f"Recording took {end - start} seconds")
+        print(f"Recording took {end - start:.3f} seconds")
 
         return self.audio
 
@@ -94,7 +94,7 @@ class Recorder:
         print(f"Audio saved to {filename}")
 
         end = time.perf_counter()
-        print(f"Saving took {end - start} seconds")
+        print(f"Saving took {end - start:.3f} seconds")
 
         return audio
 
