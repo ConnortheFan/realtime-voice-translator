@@ -1,4 +1,4 @@
-from audio.recorder import Recorder
+from capture.recorder import Recorder
 
 
 def main():

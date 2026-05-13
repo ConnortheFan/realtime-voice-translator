@@ -45,8 +45,8 @@ This project is being developed as both:
 realtime-voice-translator/
 │
 ├── src/
-│   ├── audio/
-│   ├── speech/
+│   ├── capture/
+│   ├── transcription/
 │   ├── translation/
 │   ├── tts/
 │   └── main.py
