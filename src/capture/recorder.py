@@ -30,12 +30,17 @@ class Recorder:
             dtype : Data type to store in audio array.
                 Defaults to float32.
         """
+        start = time.perf_counter()
+
         self.sample_rate = sample_rate # 16 kHz standard
         self.channels = channels # mono microphone input
         self.dtype = np.float32 
         self.audio = []
         self.stream = None
         self.recording = False
+
+        end = time.perf_counter()
+        print(f"\nInitializing Recorder took {end - start} seconds")
 
     def record(self, duration: float) -> np.ndarray:
         """
@@ -47,9 +52,9 @@ class Recorder:
         Returns:
             np.ndarray: Recorded audio samples as a NumPy array.
         """
-        num_samples = int(duration * self.sample_rate)
-
         start = time.perf_counter()
+
+        num_samples = int(duration * self.sample_rate)
 
         print(f"Recording for {duration} seconds")
 
@@ -61,28 +66,36 @@ class Recorder:
         )
         sd.wait()
 
-        end = time.perf_counter()
-
         print("Done recording")
-        print(f"Took {end - start} seconds")
-        print(f"Audio length: {len(self.audio) / self.sample_rate} seconds")
+        # print(f"Audio length: {len(self.audio) / self.sample_rate} seconds")
+
+        end = time.perf_counter()
+        print(f"Recording took {end - start} seconds")
+
         return self.audio
 
-    def record_and_save(self, duration: float, filename: str = "audio.wav") -> np.ndarray:
+    def record_and_save(self, duration: float, filename: str = "outputs/audio.wav") -> np.ndarray:
         """
         Record audio from the microphone and save it to a WAV file. Also, return it as a NumPy array.
 
         Args:
             duration (float): Recording duration in seconds.
             filename (str): Destination to save audio file. 
-                Defaults to "audio.wav".
+                Defaults to "outputs/audio.wav".
 
         Returns:
             np.ndarray: Recorded audio samples as a NumPy array.
         """
         audio = self.record(duration)
+
+        start = time.perf_counter()
+
         write(filename, self.sample_rate, self.audio)
         print(f"Audio saved to {filename}")
+
+        end = time.perf_counter()
+        print(f"Saving took {end - start} seconds")
+
         return audio
 
     def _callback(self, indata, frames, time, status): # _ at start means is internal method, don't use publicly
@@ -107,7 +120,7 @@ class Recorder:
         """
         return np.ndarray(0)
 
-    def stop_and_save(self, filename: str = "audio.wav") -> np.ndarray:
+    def stop_and_save(self, filename: str = "outputs/audio.wav") -> np.ndarray:
         """
         Stop recording and save it to a WAV file. Also return ndarray of audio.
 
@@ -115,7 +128,7 @@ class Recorder:
 
         Args:
             filename (str): Destination to save audio file. 
-                Defaults to "audio.wav"
+                Defaults to "outputs/audio.wav"
         """
         audio = self.stop()
         write(filename, self.sample_rate, audio)

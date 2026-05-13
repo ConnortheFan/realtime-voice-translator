@@ -4,6 +4,7 @@ Transcription module using the faster-whisper library.
 
 from faster_whisper import WhisperModel
 import numpy as np
+import time
 
 class Transcriber:
     """
@@ -33,6 +34,8 @@ class Transcriber:
             language (str | None): Language code (ex. "en" or "it"). Choose None to let Whisper auto-detect.
                 Defaults to None.
         """
+        start = time.perf_counter()
+
         self.language = language
         device = "cpu"
         compute_type = "int8" # int8 is fastest on CPU
@@ -41,6 +44,9 @@ class Transcriber:
             compute_type = "float16" # float16 is best on GPU
 
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
+
+        end = time.perf_counter()
+        print(f"\nInitializing Whisper model took {end - start} seconds")
 
     def transcribe(self, audio: np.ndarray) -> str:
         """
@@ -52,6 +58,8 @@ class Transcriber:
         Returns:
             str: Transcribed string.
         """
+        start = time.perf_counter()
+
         audio = self._prepare(audio)
 
         segments, _ = self.model.transcribe(
@@ -59,26 +67,37 @@ class Transcriber:
             language=self.language,
             vad_filter=True, # skip silent regions automatically
         )
-        return " ".join(segment.text.strip() for segment in segments)
+
+        transcript = " ".join(segment.text.strip() for segment in segments)
+
+        end = time.perf_counter()
+        print(f"Transcribing took {end - start} seconds")
+
+        return transcript
     
-    def transcribe_and_save(self, audio: np.ndarray, filename: str = "transcript.txt") -> str:
+    def transcribe_and_save(self, audio: np.ndarray, filename: str = "outputs/transcript.txt") -> str:
         """
         Transcribe a NumPy audio array to text. Also, save transcribed text to filename.
 
         Args:
             audio (np.ndarray): float32 array of shape (N,) or (N, 1) sampled at 16 kHz mono.
             filename (str): Destination to save transcribed text.
-                Defaults to "transcript.txt".
+                Defaults to "outputs/transcript.txt".
 
         Returns:
             str: Transcribed string.
         """
         transcript = self.transcribe(audio)
 
+        start = time.perf_counter()
+
         with open(filename, "w") as f:
             f.write(transcript)
         
         print(f"Transcript saved to {filename}")
+
+        end = time.perf_counter()
+        print(f"Saving took {end - start} seconds")
 
         return transcript
     
