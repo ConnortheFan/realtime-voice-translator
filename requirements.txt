@@ -1,5 +1,6 @@
 sounddevice
 numpy
+scipy
 faster-whisper
 argostranslate
 pyttsx3

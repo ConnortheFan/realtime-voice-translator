@@ -11,9 +11,10 @@ This project is being developed as both:
 ## Features
 
 ### Current
+- [x] Microphone audio capture 
+- [x] WAV export
 
 ### Planned
-- [ ] Live microphone audio capture
 - [ ] Speech-to-text transcription
 - [ ] Real-time translation
 - [ ] Text-to-speech playback
@@ -31,6 +32,7 @@ This project is being developed as both:
 - Python
 - sounddevice
 - NumPy
+- SciPy
 - Faster-Whisper
 - Argos Translate / LibreTranslate
 - pyttsx3
