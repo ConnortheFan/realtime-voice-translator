@@ -1,5 +1,5 @@
 """
-Audio recording module.
+Audio recording module using the sounddevice library.
 """
 
 import sounddevice as sd
@@ -11,13 +11,28 @@ class Recorder:
     """
     Record audio from the system microphone.
 
-    This class provides an interface to capture audio input using the sounddevice library.
+    This class provides an interface to capture audio input from the microphone using the sounddevice library and returns the audio as a NumPy audio array in 16 kHz mono float32 format.
+
+    Also provides optional saving of audio in WAV format.
+
+    For intended use in conjunction with the Transcriber module.
     """
 
-    def __init__(self, sample_rate: int = 16000, channels: int = 1):
-        """Create a Recorder with default values"""
-        self.sample_rate = sample_rate # 16kHz standard
-        self.channels = channels # Microphone input
+    def __init__(self, sample_rate: int = 16000, channels: int = 1, dtype=np.float32):
+        """
+        Initialize a Recorder for audio (microphone) input. For intended use with transcriber, leave default parameters.
+
+        Args:
+            sample_rate (int): The frequency of sampling for recording.
+                Defaults to 16 kHz (16,000).
+            channels (int): Number of channels of audio to expect. Currently does not support multiple channels.
+                Defaults to 1 (mono).
+            dtype : Data type to store in audio array.
+                Defaults to float32.
+        """
+        self.sample_rate = sample_rate # 16 kHz standard
+        self.channels = channels # mono microphone input
+        self.dtype = np.float32 
         self.audio = []
         self.stream = None
         self.recording = False
@@ -42,7 +57,7 @@ class Recorder:
             num_samples,
             samplerate=self.sample_rate,
             channels=self.channels,
-            dtype=np.float32
+            dtype=self.dtype
         )
         sd.wait()
 
@@ -59,13 +74,12 @@ class Recorder:
 
         Args:
             duration (float): Recording duration in seconds.
-            filename (str): Filename to save audio file. 
-                Defaults to "audio.wav"
+            filename (str): Destination to save audio file. 
+                Defaults to "audio.wav".
 
         Returns:
             np.ndarray: Recorded audio samples as a NumPy array.
         """
-
         audio = self.record(duration)
         write(filename, self.sample_rate, self.audio)
         print(f"Audio saved to {filename}")
@@ -100,10 +114,9 @@ class Recorder:
         Intended to be used wtih start()
 
         Args:
-            filename (str): Filename to save audio file. 
+            filename (str): Destination to save audio file. 
                 Defaults to "audio.wav"
         """
-
         audio = self.stop()
         write(filename, self.sample_rate, audio)
         return audio

@@ -13,9 +13,9 @@ This project is being developed as both:
 ### Current
 - [x] Microphone audio capture 
 - [x] WAV export
+- [x] Speech-to-text transcription
 
 ### Planned
-- [ ] Speech-to-text transcription
 - [ ] Real-time translation
 - [ ] Text-to-speech playback
 - [ ] Continuous streaming translation
@@ -46,7 +46,9 @@ realtime-voice-translator/
 │
 ├── src/
 │   ├── capture/
+|   |   └── recorder.py
 │   ├── transcription/
+|   |   └── transcriber.py
 │   ├── translation/
 │   ├── tts/
 │   └── main.py
@@ -123,6 +125,10 @@ pip install -r requirements.txt
 python src/main.py
 ```
 
+### Note
+
+When running this program for the first time, it will need to download the Whisper Model. After the model is downloaded, the program should then be able to be run offline.
+
 ---
 
 ## Goals
@@ -150,8 +156,8 @@ This project is intended to help develop experience with:
 ## Roadmap
 
 ### Phase 1
-- [ ] Capture microphone input
-- [ ] Transcribe speech locally
+- [x] Capture microphone input
+- [x] Transcribe speech locally
 
 ### Phase 2
 - [ ] Add translation pipeline
