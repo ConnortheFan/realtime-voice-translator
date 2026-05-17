@@ -91,7 +91,7 @@ class Transcriber:
 
         start = time.perf_counter()
 
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(transcript)
         
         print(f"Transcript saved to {filename}")
