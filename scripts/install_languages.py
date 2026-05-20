@@ -1,5 +1,5 @@
 """
-Download Argos Translate language pairs.
+Download Argos Translate language pairs and Piper TTS voices.
  
 Usage:
     python scripts/install_languages.py en it
@@ -8,10 +8,19 @@ Usage:
 This will download ALL directional pairs between the given language codes.
 For 3 languages (e.g. en es it), that's 6 pairs:
     en->es, es->en, en->it, it->en, es->it, it->es
+
+This will also download the voices associated with each language for Text-to-Speech.
 """
 
 import argparse
 import argostranslate.package
+
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(PROJECT_ROOT))
+from src.tts.download_voice import download_voice_tts
 
 from itertools import permutations
 
@@ -75,7 +84,14 @@ def main():
             success = argostranslate.package.install_package_for_language_pair(from_code, to_code)
             if not success:
                 print(f"ERROR: Package {from_code} -> {to_code} failed to install")
-        print("Finished installing")
+        print("Finished installing translation pairs")
+
+        # Force install all voices
+        print(f"Installing {len(codes)} voices...")
+        for code in codes:
+            print(f"Installing {code} voice")
+            download_voice_tts(code, force=True)
+        print("Finished installing voices")
         return
 
 
@@ -98,8 +114,14 @@ def main():
             success = argostranslate.package.install_package_for_language_pair(from_code, to_code)
             if not success:
                 print(f"ERROR: Package {from_code} -> {to_code} failed to install")
-        print("Finished installing")
-        return
+        print("Finished installing translation pairs")
+        
+    # Force install all voices
+    print(f"Installing {len(codes)} voices...")
+    for code in codes:
+        print(f"Installing {code} voice")
+        download_voice_tts(code)
+    print("Finished installing voices")
 
 if __name__ == "__main__":
     main()
