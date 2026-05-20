@@ -15,9 +15,9 @@ This project is being developed as both:
 - [x] WAV export
 - [x] Speech-to-text transcription
 - [x] Real-time translation
+- [x] Text-to-speech playback
 
 ### Planned
-- [ ] Text-to-speech playback
 - [ ] Continuous streaming translation
 - [ ] Reduced latency pipeline
 - [ ] Multiple language support
@@ -172,8 +172,8 @@ This project is intended to help develop experience with:
 - [x] Transcribe speech locally
 
 ### Phase 2
-- [ ] Add translation pipeline
-- [ ] Add speech playback
+- [x] Add translation pipeline
+- [x] Add speech playback
 
 ### Phase 3
 - [ ] Improve responsiveness
