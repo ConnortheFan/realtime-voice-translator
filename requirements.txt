@@ -4,3 +4,4 @@ scipy
 faster-whisper
 argostranslate
 pyttsx3
+piper-tts

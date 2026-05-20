@@ -14,9 +14,9 @@ This project is being developed as both:
 - [x] Microphone audio capture 
 - [x] WAV export
 - [x] Speech-to-text transcription
+- [x] Real-time translation
 
 ### Planned
-- [ ] Real-time translation
 - [ ] Text-to-speech playback
 - [ ] Continuous streaming translation
 - [ ] Reduced latency pipeline
@@ -35,7 +35,7 @@ This project is being developed as both:
 - SciPy
 - Faster-Whisper
 - Argos Translate / LibreTranslate
-- pyttsx3
+- piper-tts
 
 ---
 
@@ -44,13 +44,19 @@ This project is being developed as both:
 ```text
 realtime-voice-translator/
 │
+├── scripts/
+|   └── install_languages.py
+|
 ├── src/
 │   ├── capture/
 |   |   └── recorder.py
 │   ├── transcription/
 |   |   └── transcriber.py
 │   ├── translation/
+|   |   └── translator.py
 │   ├── tts/
+|   |   ├── download_voice.py
+|   |   └── tts.py
 │   └── main.py
 │
 ├── requirements.txt
@@ -128,6 +134,12 @@ python src/main.py
 ### Note
 
 When running this program for the first time, it will need to download the Whisper Model. After the model is downloaded, the program should then be able to be run offline.
+
+The program will also have to download language translation pairs as well as voices for each language. This will happen at first run, but you can speed it up by running 
+
+```bash
+python scripts/install_languages.py <lang_code> <lang_code> ...
+```
 
 ---
 
