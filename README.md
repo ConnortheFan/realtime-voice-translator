@@ -16,6 +16,7 @@ This project is being developed as both:
 - [x] Speech-to-text transcription
 - [x] Real-time translation
 - [x] Text-to-speech playback
+- [x] Push-to-talk functionality
 
 ### Planned
 - [ ] Continuous streaming translation

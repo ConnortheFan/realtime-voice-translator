@@ -122,7 +122,6 @@ class Recorder:
         self.start_time = time.perf_counter()
 
         print("Recording...")
-        print("Press Space to stop...\n")
 
 
     def stop(self) -> np.ndarray:
