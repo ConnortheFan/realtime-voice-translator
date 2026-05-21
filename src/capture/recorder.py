@@ -36,7 +36,11 @@ class Recorder:
         self.channels = channels # mono microphone input
         self.dtype = np.float32 
         self.audio = []
-        self.stream = None
+        self.stream = sd.InputStream(
+            samplerate=self.sample_rate,
+            channels=self.channels,
+            callback=self._callback
+        )
         self.recording = False
 
         end = time.perf_counter()
@@ -44,7 +48,7 @@ class Recorder:
 
     def record(self, duration: float) -> np.ndarray:
         """
-        Record audio from the microphone and return it as an NumPy array.
+        Record audio from the microphone for a set duration and return it as an NumPy array.
 
         Args:
             duration (float): Recording duration in seconds.
@@ -58,7 +62,7 @@ class Recorder:
 
         print(f"Recording for {duration} seconds")
 
-        self.audio = sd.rec(
+        audio = sd.rec(
             num_samples,
             samplerate=self.sample_rate,
             channels=self.channels,
@@ -67,16 +71,16 @@ class Recorder:
         sd.wait()
 
         print("Done recording")
-        # print(f"Audio length: {len(self.audio) / self.sample_rate} seconds")
+        # print(f"Audio length: {len(audio) / self.sample_rate} seconds")
 
         end = time.perf_counter()
         print(f"Recording took {end - start:.3f} seconds")
 
-        return self.audio
+        return audio
 
     def record_and_save(self, duration: float, filename: str = "outputs/audio.wav") -> np.ndarray:
         """
-        Record audio from the microphone and save it to a WAV file. Also, return it as a NumPy array.
+        Record audio from the microphone for a set duration and save it to a WAV file. Also, return it as a NumPy array.
 
         Args:
             duration (float): Recording duration in seconds.
@@ -100,17 +104,26 @@ class Recorder:
 
     def _callback(self, indata, frames, time, status): # _ at start means is internal method, don't use publicly
         """
-        Call at the sample_rate of the audio stream to append indata array to the actual stream. For use in audio stream in later implementation.
+        Call at the sample_rate of the audio stream to append indata array to the actual stream. For use in audio stream.
         """
-        pass
+        self.audio.append(indata.copy())
+        
 
     def start(self) -> None:
         """
-        Start recording from microphone to audio stream.
+        Start recording from microphone to audio stream. For use in live processing.
         
         Intended to be used with stop() or stop_and_save().
         """
-        pass
+        self.audio = []
+        self.stream.start()
+        self.recording = True
+
+        self.start_time = time.perf_counter()
+
+        print("Recording...")
+        print("Press Space to stop...\n")
+
 
     def stop(self) -> np.ndarray:
         """
@@ -118,7 +131,13 @@ class Recorder:
         
         Intended to be used with start().
         """
-        return np.ndarray(0)
+        self.stream.stop()
+        self.recording = False
+
+        self.end_time = time.perf_counter()
+        print(f"Recording took {self.end_time - self.start_time:.3f} seconds")
+
+        return np.concatenate(self.audio)
 
     def stop_and_save(self, filename: str = "outputs/audio.wav") -> np.ndarray:
         """

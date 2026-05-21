@@ -3,14 +3,31 @@ from transcription.transcriber import Transcriber
 from translation.translator import Translator
 from tts.tts import TextToSpeech
 import time
+from pynput import keyboard
+
+finished = False
+
+def on_press(key):
+    global finished
+    if key == keyboard.Key.space:
+        print("Pressed space, stopping recording")
+        finished = True
 
 def main():
     start = time.perf_counter()
 
     print("Starting main module")
 
+    listener = keyboard.Listener(on_press=on_press)
+    listener.start()
+
     recorder = Recorder()
-    recording = recorder.record_and_save(10)
+    recorder.start()
+
+    while not finished:
+        pass
+
+    recording = recorder.stop_and_save()
 
     transcriber = Transcriber()
     transcription = transcriber.transcribe_and_save(recording)

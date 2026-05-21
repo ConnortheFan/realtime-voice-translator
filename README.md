@@ -34,8 +34,9 @@ This project is being developed as both:
 - NumPy
 - SciPy
 - Faster-Whisper
-- Argos Translate / LibreTranslate
+- Argos Translate
 - piper-tts
+- pynput
 
 ---
 
