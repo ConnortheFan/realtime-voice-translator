@@ -131,7 +131,7 @@ class Transcriber:
 
         return transcript
     
-    def transcribe_to_en_and_save(self, audio: np.ndarray, lang: str | None = None, filename: str = "outputs/transcript.txt") -> str:
+    def transcribe_to_en_and_save(self, audio: np.ndarray, lang: str | None = None, filename: str = "outputs/transcript_en.txt") -> str:
         """
         Transcribe and translate a NumPy audio array to English.
 

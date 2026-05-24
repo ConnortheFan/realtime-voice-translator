@@ -152,3 +152,22 @@ class Recorder:
         write(filename, self.sample_rate, audio)
         return audio
     
+    def get_audio_and_save(self, filename: str = "outputs/audio.wav") -> np.ndarray:
+        """
+        Get current audio array since last call to get_audio or start and save it to a WAV file. Will clear audio buffer when called.
+
+        Audio stream must be started with the start() function.
+
+        Args:
+            filename (str): Destination to save audio file. 
+                Defaults to "outputs/audio.wav"
+        """
+        audio = np.concatenate(self.audio)
+        self.audio = []
+        write(filename, self.sample_rate, audio)
+        return audio
+    
+    
+    def clear_audio(self):
+        """Clears the audio buffer."""
+        self.audio = []

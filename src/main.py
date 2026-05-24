@@ -7,56 +7,81 @@ from pynput import keyboard
 
 recording = False
 running = True
+transcribe_to_en = False
 
 def on_press(key):
-    global recording, running
+    global recording, running, transcribe_to_en
     if key == keyboard.Key.space:
         recording = True
+    elif key == keyboard.Key.enter:
+        transcribe_to_en = True
     elif key == keyboard.Key.esc:
         print("\nESC pressed, program exiting")
         running = False
 
 def on_release(key):
-    global recording
+    global recording, transcribe_to_en
     if key == keyboard.Key.space:
         recording = False
+    elif key == keyboard.Key.enter:
+        transcribe_to_en = False
 
 def main():
     start = time.perf_counter()
 
-    global recording, running
+    global recording, running, transcribe_to_en
 
     print("Starting main module")
 
     recorder = Recorder()
     transcriber = Transcriber()
-    translator = Translator("it")
+    translator = Translator("it", "en")
     tts_it = TextToSpeech("it")
+    tts_en = TextToSpeech("en")
 
     listener = keyboard.Listener(on_press=on_press, on_release=on_release)
     listener.start()
 
     print("All modules initialized, program running")
+    print("Press ENTER to transcribe Italian to English")
     print("Hold SPACE to talk")
     print("Press ESC to quit")
 
     started = False
+    transcribing = False
+
+    recorder.start()
 
     while running:
-        
+        # You speaking via push-to-talk SPACE bar
         if recording and not started:
             started = True
             print("\nRecording started")
-            recorder.start()
+            recorder.clear_audio()
             
         elif not recording and started:
             started = False
             print("Recording stopped")
 
-            recording_audio = recorder.stop_and_save()
+            recording_audio = recorder.get_audio_and_save()
             transcription = transcriber.transcribe_and_save(recording_audio)
             translation = translator.translate_ba_and_save(transcription)
             tts_it.speak_and_save(translation)
+            recorder.clear_audio()
+        
+        # Someone else speaking Italian
+        elif transcribe_to_en and not transcribing:
+            print("Transcribing to English")
+            transcribing = True
+            recording_audio_en = recorder.get_audio_and_save()
+            transcription_en = transcriber.transcribe_to_en_and_save(recording_audio_en, "it")
+            tts_en.speak_and_save(transcription_en)
+        elif transcribing and not transcribe_to_en:
+            transcribing = False
+            print("Done transcribing")
+            recorder.clear_audio()
+
+    recorder.stop()
 
     end = time.perf_counter()
     print(f"\nProgram took {end - start:.3f} seconds")

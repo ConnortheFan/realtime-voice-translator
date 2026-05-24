@@ -17,6 +17,7 @@ This project is being developed as both:
 - [x] Real-time translation
 - [x] Text-to-speech playback
 - [x] Push-to-talk functionality
+- [x] Bidirectional conversation mode
 
 ### Planned
 - [ ] Continuous streaming translation
@@ -24,7 +25,6 @@ This project is being developed as both:
 - [ ] Multiple language support
 - [ ] Voice activity detection
 - [ ] Simple desktop GUI
-- [ ] Bidirectional conversation mode
 
 ---
 
