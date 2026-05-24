@@ -49,7 +49,6 @@ def main():
             print("\nRecording started")
             recorder.start()
             
-
         elif not recording and started:
             started = False
             print("Recording stopped")

@@ -21,7 +21,6 @@ class Transcriber:
         self,
         model_size: str = "base",
         cuda: bool = False,
-        language: str | None = None
     ) -> None:
         """
         Initialize the Whisper model.
@@ -31,12 +30,9 @@ class Transcriber:
                 Defaults to "base" model.
             cuda (bool): If CUDA GPU is available. Otherwise, will use CPU.
                 Defaults to False.
-            language (str | None): Language code (ex. "en" or "it"). Choose None to let Whisper auto-detect.
-                Defaults to None.
         """
         start = time.perf_counter()
 
-        self.language = language
         device = "cpu"
         compute_type = "int8" # int8 is fastest on CPU
         if cuda:
@@ -48,12 +44,14 @@ class Transcriber:
         end = time.perf_counter()
         print(f"\nInitializing Whisper model took {end - start:.3f} seconds")
 
-    def transcribe(self, audio: np.ndarray) -> str:
+    def transcribe(self, audio: np.ndarray, lang: str | None = None) -> str:
         """
         Transcribe a NumPy audio array to text.
 
         Args:
             audio (np.ndarray): NumPy array of shape (N,) or (N, 1) sampled at 16 kHz mono.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+                Defaults to None.
 
         Returns:
             str: Transcribed string.
@@ -64,7 +62,7 @@ class Transcriber:
 
         segments, _ = self.model.transcribe(
             audio,
-            language=self.language,
+            language=lang,
             vad_filter=True, # skip silent regions automatically
         )
 
@@ -75,19 +73,21 @@ class Transcriber:
 
         return transcript
     
-    def transcribe_and_save(self, audio: np.ndarray, filename: str = "outputs/transcript.txt") -> str:
+    def transcribe_and_save(self, audio: np.ndarray, lang: str | None = None, filename: str = "outputs/transcript.txt") -> str:
         """
         Transcribe a NumPy audio array to text. Also, save transcribed text to filename.
 
         Args:
             audio (np.ndarray): float32 array of shape (N,) or (N, 1) sampled at 16 kHz mono.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+                Defaults to None.
             filename (str): Destination to save transcribed text.
                 Defaults to "outputs/transcript.txt".
 
         Returns:
             str: Transcribed string.
         """
-        transcript = self.transcribe(audio)
+        transcript = self.transcribe(audio, lang)
 
         start = time.perf_counter()
 
@@ -101,6 +101,64 @@ class Transcriber:
 
         return transcript
     
+    def transcribe_to_en(self, audio: np.ndarray, lang: str | None = None) -> str:
+        """
+        Transcribe and translate a NumPy audio array to English.
+
+        Args:
+            audio (np.ndarray): NumPy array of shape (N,) or (N, 1) sampled at 16 kHz mono.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+                Defaults to None.
+
+        Returns:
+            str: Transcribed string.
+        """
+        start = time.perf_counter()
+
+        audio = self._prepare(audio)
+
+        segments, _ = self.model.transcribe(
+            audio,
+            language=lang,
+            task="translate", # automatically translate to English
+            vad_filter=True, # skip silent regions automatically
+        )
+
+        transcript = " ".join(segment.text.strip() for segment in segments)
+
+        end = time.perf_counter()
+        print(f"Transcribing took {end - start:.3f} seconds")
+
+        return transcript
+    
+    def transcribe_to_en_and_save(self, audio: np.ndarray, lang: str | None = None, filename: str = "outputs/transcript.txt") -> str:
+        """
+        Transcribe and translate a NumPy audio array to English.
+
+        Args:
+            audio (np.ndarray): NumPy array of shape (N,) or (N, 1) sampled at 16 kHz mono.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+                Defaults to None.
+            filename (str): Destination to save transcribed text.
+                Defaults to "outputs/transcript.txt".
+
+        Returns:
+            str: Transcribed string.
+        """
+        transcript = self.transcribe_to_en(audio, lang)
+
+        start = time.perf_counter()
+
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(transcript)
+        
+        print(f"Transcript saved to {filename}")
+
+        end = time.perf_counter()
+        print(f"Saving took {end - start:.3f} seconds")
+
+        return transcript
+
     def _prepare(self, audio: np.ndarray) -> np.ndarray:
         """Normalize shape and dtype for Whisper model."""
         audio = np.squeeze(audio) # (N, 1) -> (N,)
