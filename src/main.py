@@ -63,19 +63,19 @@ def main():
             started = False
             print("Recording stopped")
 
-            recording_audio = recorder.get_audio_and_save()
-            transcription = transcriber.transcribe_and_save(recording_audio)
-            translation = translator.translate_ba_and_save(transcription)
-            tts_it.speak_and_save(translation)
+            recording_audio = recorder.get_audio()
+            transcription = transcriber.transcribe(recording_audio)
+            translation = translator.translate_ba(transcription)
+            tts_it.speak(translation)
             recorder.clear_audio()
         
         # Someone else speaking Italian
         elif transcribe_to_en and not transcribing:
             print("Transcribing to English")
             transcribing = True
-            recording_audio_en = recorder.get_audio_and_save()
-            transcription_en = transcriber.transcribe_to_en_and_save(recording_audio_en, "it")
-            tts_en.speak_and_save(transcription_en)
+            recording_audio_en = recorder.get_audio()
+            transcription_en = transcriber.transcribe_to_en(recording_audio_en, "it")
+            tts_en.speak(transcription_en)
         elif transcribing and not transcribe_to_en:
             transcribing = False
             print("Done transcribing")

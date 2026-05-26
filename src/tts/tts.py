@@ -59,9 +59,14 @@ class TextToSpeech:
         end = time.perf_counter()
         print(f"\nInitializing TTS took {end - start:.3f} seconds")
 
-    def speak_and_save(self, text: str, filename: str = "outputs/tts_output.wav"):
+    def speak(self, text: str, filename: str = "outputs/tts_output.wav") -> None:
         """
-        Synthesize the given text into audio and play it through the system's audio output.
+        Synthesize the given text into audio and play it through the system's audio output. Also, will save audio output to files as a WAV file.
+
+        Args:
+            text (str): Text to speak.
+            filename (str): Destination to save output audio.
+                Defaults to "outputs/tts_output.wav".
         """
         start = time.perf_counter()
 
@@ -73,12 +78,9 @@ class TextToSpeech:
         wav_file = wave.Wave_read(wav_path)
         sample_rate = wav_file.getframerate()
         frames = wav_file.readframes(wav_file.getnframes())
-        channels = wav_file.getnchannels()
-
         audio = np.frombuffer(frames, dtype=np.int16)
 
-        end = time.perf_counter()
-        print(f"Doing Text-to-Speech took {end - start:.3f} seconds")
+        print(f"Transforming Text-to-Speech took {time.perf_counter() - start:.3f} seconds")
 
         start = time.perf_counter()
 
@@ -87,14 +89,13 @@ class TextToSpeech:
         sd.wait()
         print("Finished playing")
 
-        end = time.perf_counter()
-        print(f"Playing audio took {end - start:.3f} seconds")
+        print(f"Playing audio took {time.perf_counter() - start:.3f} seconds")
 
         
 
 if __name__ == "__main__":
     tts_en = TextToSpeech("en")
-    tts_en.speak_and_save("Hello, this is a test to see if your audio is working.")
+    tts_en.speak("Hello, this is a test to see if your audio is working.")
 
     tts_it = TextToSpeech("it")
-    tts_it.speak_and_save("Ciao bello. Io sono stanco e voglio dormire.")
+    tts_it.speak("Ciao bello. Io sono stanco e voglio dormire.")

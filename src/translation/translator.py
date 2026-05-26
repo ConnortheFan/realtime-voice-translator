@@ -56,13 +56,16 @@ class Translator:
         end = time.perf_counter()
         print(f"\nInitializing translation pair took {end - start:.3f} seconds")
 
-
-    def translate_ab(self, text: str) -> str:
+    def translate_ab(self, text: str, save: bool = True, filename: str = "outputs/translation_ab.txt") -> str:
         """
-        Translate text from lang_a -> lang_b.
+        Translate and return text from lang_a -> lang_b. Also, optionally save translation.
 
         Args:
             text (str): Text you want translated.
+            save (bool): Whether to save translation to files.
+                Defaults to True.
+            filename (str): Destination to save transcribed text.
+                Defaults to "outputs/translation_ab.txt".
 
         Returns:
             str: Translated text.
@@ -71,17 +74,31 @@ class Translator:
 
         translated = argostranslate.translate.translate(text, self.lang_a, self.lang_b)
 
-        end = time.perf_counter()
-        print(f"Translating from {self.lang_a} -> {self.lang_b} took {end - start:.3f} seconds")
+        print(f"Translating from {self.lang_a} -> {self.lang_b} took {time.perf_counter() - start:.3f} seconds")
+    
+        if save:
+            start = time.perf_counter()
+
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(translated)
+            
+            print(f"Translation saved to {filename}")
+
+            end = time.perf_counter()
+            print(f"Saving took {end - start:.3f} seconds")
 
         return translated
 
-    def translate_ba(self, text: str) -> str:
+    def translate_ba(self, text: str, save: bool = True, filename: str = "outputs/translation_ba.txt") -> str:
         """
-        Translate text from lang_b -> lang_a.
+        Translate and return text from lang_b -> lang_a. Also, optionally save translation.
 
         Args:
             text (str): Text you want translated.
+            save (bool): Whether to save translation to files.
+                Defaults to True.
+            filename (str): Destination to save transcribed text.
+                Defaults to "outputs/translation_ba.txt".
 
         Returns:
             str: Translated text.
@@ -90,62 +107,18 @@ class Translator:
 
         translated = argostranslate.translate.translate(text, self.lang_b, self.lang_a)
 
-        end = time.perf_counter()
-        print(f"Translating from {self.lang_b} -> {self.lang_a} took {end - start:.3f} seconds")
+        print(f"Translating from {self.lang_b} -> {self.lang_a} took {time.perf_counter() - start:.3f} seconds")
 
-        return translated
-    
-    def translate_ab_and_save(self, text: str, filename: str = "outputs/translation_ab.txt") -> str:
-        """
-        Translate text from lang_a -> lang_b. Also, save translated text to filename.
+        if save:
+            start = time.perf_counter()
 
-        Args:
-            text (str): Text you want translated.
-            filename (str): Destination to save transcribed text.
-                Defaults to "outputs/translation_ab.txt".
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(translated)
+            
+            print(f"Translation saved to {filename}")
+            print(f"Saving took {time.perf_counter() - start:.3f} seconds")
 
-        Returns:
-            str: Translated text.
-        """
-        translated = self.translate_ab(text)
-
-        start = time.perf_counter()
-
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(translated)
-        
-        print(f"Translation saved to {filename}")
-
-        end = time.perf_counter()
-        print(f"Saving took {end - start:.3f} seconds")
-
-        return translated
-
-    def translate_ba_and_save(self, text: str, filename: str = "outputs/translation_ba.txt") -> str:
-        """
-        Translate text from lang_a -> lang_b. Also, save translated text to filename.
-
-        Args:
-            text (str): Text you want translated.
-            filename (str): Destination to save transcribed text.
-                Defaults to "outputs/translation_ba.txt".
-
-        Returns:
-            str: Translated text.
-        """
-        translated = self.translate_ba(text)
-
-        start = time.perf_counter()
-
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(translated)
-        
-        print(f"Translation saved to {filename}")
-
-        end = time.perf_counter()
-        print(f"Saving took {end - start:.3f} seconds")
-
-        return translated
+        return translated    
     
 if __name__ == "__main__":
     t = Translator("it")
