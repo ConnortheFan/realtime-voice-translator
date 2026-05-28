@@ -60,7 +60,7 @@ class TextToSpeech:
 
     def speak(self, text: str, filename: str = "outputs/tts_output.wav") -> None:
         """
-        Synthesize the given text into audio and play it through the system's audio output. Also, will save audio output to files as a WAV file.
+        Synthesize the given text into audio and play it through the system's audio output. Also, will save audio output to files as a WAV file. Will hold program until speaking is done.
 
         Args:
             text (str): Text to speak.

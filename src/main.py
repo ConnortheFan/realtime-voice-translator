@@ -32,8 +32,6 @@ def main():
     setup_logging(debug = False)
     global recording, running, transcribe_to_en
 
-    print("Starting main module")
-
     recorder = Recorder()
     transcriber = Transcriber()
     translator = Translator("it", "en")
@@ -67,7 +65,9 @@ def main():
             recording_audio = recorder.get_audio()
             transcription = transcriber.transcribe(recording_audio)
             translation = translator.translate_ba(transcription)
+            print("Speaking started")
             tts_it.speak(translation)
+            print("Speaking stopped")
             recorder.clear_audio()
         
         # Someone else speaking Italian
@@ -76,7 +76,9 @@ def main():
             transcribing = True
             recording_audio_en = recorder.get_audio()
             transcription_en = transcriber.transcribe_to_en(recording_audio_en, "it")
+            print("Speaking started")
             tts_en.speak(transcription_en)
+            print("Speaking stopped")
         elif transcribing and not transcribe_to_en:
             transcribing = False
             print("Done transcribing")
