@@ -5,6 +5,7 @@ Transcription module using the faster-whisper library.
 from faster_whisper import WhisperModel
 import numpy as np
 import time
+from log_utils import get_logger, log_calls
 
 class Transcriber:
     """
@@ -17,6 +18,9 @@ class Transcriber:
     For intended use with the Recorder module.
     """
 
+    logger = get_logger(__name__)
+
+    @log_calls
     def __init__(
         self,
         model_size: str = "base",
@@ -31,8 +35,6 @@ class Transcriber:
             cuda (bool): If CUDA GPU is available. Otherwise, will use CPU.
                 Defaults to False.
         """
-        start = time.perf_counter()
-
         device = "cpu"
         compute_type = "int8" # int8 is fastest on CPU
         if cuda:
@@ -40,10 +42,8 @@ class Transcriber:
             compute_type = "float16" # float16 is best on GPU
 
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
-
-        end = time.perf_counter()
-        print(f"\nInitializing Whisper model took {end - start:.3f} seconds")
     
+    @log_calls
     def transcribe(self, audio: np.ndarray, lang: str | None = None, save: bool = True, filename: str = "outputs/transcript.txt") -> str:
         """
         Transcribe and return a NumPy audio array to text. Also, optionally save transcribed text.
@@ -60,8 +60,6 @@ class Transcriber:
         Returns:
             str: Transcribed string.
         """
-        start = time.perf_counter()
-
         audio = self._prepare(audio)
 
         segments, _ = self.model.transcribe(
@@ -72,20 +70,15 @@ class Transcriber:
 
         transcript = " ".join(segment.text.strip() for segment in segments)
 
-        print(f"Transcribing took {time.perf_counter() - start:.3f} seconds")
-
         if save:
-            start = time.perf_counter()
-
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(transcript)
         
-            print(f"Transcript saved to {filename}")
-
-            print(f"Saving took {time.perf_counter() - start:.3f} seconds")
+            self.logger.debug(f"Transcript saved to {filename}")
 
         return transcript
     
+    @log_calls
     def transcribe_to_en(self, audio: np.ndarray, lang: str | None = None, save: bool = True, filename: str = "outputs/transcript_en.txt") -> str:
         """
         Transcribe and translate a NumPy audio array to English. Returns translated text. Also, optionally save text.
@@ -102,8 +95,6 @@ class Transcriber:
         Returns:
             str: Transcribed string.
         """
-        start = time.perf_counter()
-
         audio = self._prepare(audio)
 
         segments, _ = self.model.transcribe(
@@ -115,16 +106,10 @@ class Transcriber:
 
         transcript = " ".join(segment.text.strip() for segment in segments)
 
-        print(f"Transcribing took {time.perf_counter() - start:.3f} seconds")
-
         if save:
-            start = time.perf_counter()
-
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(transcript)
-            
-            print(f"Transcript saved to {filename}")
-            print(f"Saving took {time.perf_counter() - start:.3f} seconds")
+            self.logger.debug(f"Transcript saved to {filename}")
 
         return transcript
 

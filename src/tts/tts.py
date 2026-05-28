@@ -9,6 +9,7 @@ import sounddevice as sd
 import wave
 import numpy as np
 import time
+from log_utils import get_logger, log_calls
 
 DEFAULT_VOICE_DIR = Path("./voices")
 
@@ -34,6 +35,9 @@ class TextToSpeech:
     This class provides an interface to use PiperVoice for 2 languages. Voices must be downloaded and kept in voices/, which will happen automatically or by calling scripts/install_languages.py
     """
 
+    logger = get_logger(__name__)
+
+    @log_calls
     def __init__(self, lang: str, auto_download: bool = True):
         """
         Initialize the TTS engine.
@@ -43,8 +47,6 @@ class TextToSpeech:
             auto_download (bool): Whether to automatically download the voice files for languages.
                 Defaults to True.
         """
-        start = time.perf_counter()
-
         self.lang = lang
         voice_path = _find_voice_path(lang)
 
@@ -55,9 +57,6 @@ class TextToSpeech:
         if voice_path is None:
             raise ValueError("Voice Path not found")
         self.voice = PiperVoice.load(voice_path)
-
-        end = time.perf_counter()
-        print(f"\nInitializing TTS took {end - start:.3f} seconds")
 
     def speak(self, text: str, filename: str = "outputs/tts_output.wav") -> None:
         """
@@ -80,16 +79,14 @@ class TextToSpeech:
         frames = wav_file.readframes(wav_file.getnframes())
         audio = np.frombuffer(frames, dtype=np.int16)
 
-        print(f"Transforming Text-to-Speech took {time.perf_counter() - start:.3f} seconds")
+        self.logger.debug(f"Transforming Text-to-Speech took {time.perf_counter() - start:.3f} seconds")
 
         start = time.perf_counter()
 
-        print("Playing audio")
         sd.play(audio, sample_rate)
         sd.wait()
-        print("Finished playing")
 
-        print(f"Playing audio took {time.perf_counter() - start:.3f} seconds")
+        self.logger.debug(f"Playing audio took {time.perf_counter() - start:.3f} seconds")
 
         
 

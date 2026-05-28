@@ -4,6 +4,7 @@ from translation.translator import Translator
 from tts.tts import TextToSpeech
 import time
 from pynput import keyboard
+from log_utils import setup_logging, log_calls
 
 recording = False
 running = True
@@ -26,9 +27,9 @@ def on_release(key):
     elif key == keyboard.Key.enter:
         transcribe_to_en = False
 
+@log_calls
 def main():
-    start = time.perf_counter()
-
+    setup_logging(debug = False)
     global recording, running, transcribe_to_en
 
     print("Starting main module")
@@ -82,9 +83,6 @@ def main():
             recorder.clear_audio()
 
     recorder.stop()
-
-    end = time.perf_counter()
-    print(f"\nProgram took {end - start:.3f} seconds")
 
 if __name__ == "__main__":
     main()

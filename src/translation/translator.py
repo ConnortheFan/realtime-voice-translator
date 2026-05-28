@@ -5,6 +5,7 @@ Translating module using Argos Translate for offline translation.
 import argostranslate.package
 import argostranslate.translate
 import time
+from log_utils import get_logger, log_calls
 
 class Translator:
     """
@@ -15,6 +16,9 @@ class Translator:
     Downloading language packs requires internet connection.    
     """
 
+    logger = get_logger(__name__)
+
+    @log_calls
     def __init__(self, lang_a: str, lang_b: str = "en") -> None:
         """
         Initialize the translator. Upon first run with a language pair, will download language packs.
@@ -35,8 +39,6 @@ class Translator:
             lang_b: ISO 639 code for the second language.
                 Defaults to "en".
         """
-        start = time.perf_counter()
-
         self.lang_a = lang_a
         self.lang_b = lang_b
         
@@ -45,17 +47,15 @@ class Translator:
         installed_pairs = {(p.from_code, p.to_code) for p in installed}
 
         if (lang_a, lang_b) not in installed_pairs:
-            print(f"Installing {lang_a} -> {lang_b} package...")
+            self.logger.info(f"Installing {lang_a} -> {lang_b} package...")
             argostranslate.package.install_package_for_language_pair(lang_a, lang_b)
-            print(f"Installed {lang_a} -> {lang_b} package")
+            self.logger.info(f"Installed {lang_a} -> {lang_b} package")
         if (lang_b, lang_a) not in installed_pairs:
-            print(f"Installing {lang_b} -> {lang_a} package...")
+            self.logger.info(f"Installing {lang_b} -> {lang_a} package...")
             argostranslate.package.install_package_for_language_pair(lang_b, lang_a)
-            print(f"Installed {lang_b} -> {lang_a} package")
+            self.logger.info(f"Installed {lang_b} -> {lang_a} package")
 
-        end = time.perf_counter()
-        print(f"\nInitializing translation pair took {end - start:.3f} seconds")
-
+    @log_calls
     def translate_ab(self, text: str, save: bool = True, filename: str = "outputs/translation_ab.txt") -> str:
         """
         Translate and return text from lang_a -> lang_b. Also, optionally save translation.
@@ -70,25 +70,17 @@ class Translator:
         Returns:
             str: Translated text.
         """
-        start = time.perf_counter()
-
         translated = argostranslate.translate.translate(text, self.lang_a, self.lang_b)
-
-        print(f"Translating from {self.lang_a} -> {self.lang_b} took {time.perf_counter() - start:.3f} seconds")
     
         if save:
-            start = time.perf_counter()
-
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(translated)
             
-            print(f"Translation saved to {filename}")
-
-            end = time.perf_counter()
-            print(f"Saving took {end - start:.3f} seconds")
+            self.logger.debug(f"Translation saved to {filename}")
 
         return translated
 
+    @log_calls
     def translate_ba(self, text: str, save: bool = True, filename: str = "outputs/translation_ba.txt") -> str:
         """
         Translate and return text from lang_b -> lang_a. Also, optionally save translation.
@@ -103,20 +95,13 @@ class Translator:
         Returns:
             str: Translated text.
         """
-        start = time.perf_counter()
-
         translated = argostranslate.translate.translate(text, self.lang_b, self.lang_a)
 
-        print(f"Translating from {self.lang_b} -> {self.lang_a} took {time.perf_counter() - start:.3f} seconds")
-
         if save:
-            start = time.perf_counter()
-
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(translated)
             
-            print(f"Translation saved to {filename}")
-            print(f"Saving took {time.perf_counter() - start:.3f} seconds")
+            self.logger.debug(f"Translation saved to {filename}")
 
         return translated    
     
