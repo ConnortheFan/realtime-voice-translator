@@ -1,7 +1,11 @@
+"""
+Config file for my logger. Supresses many 3rd party logs.
+"""
+
 import logging
-import warnings
 
 def setup_logging(debug: bool = False):
+    """Setup logging in the main/root module."""
     level = logging.DEBUG if debug else logging.INFO
 
     logging.basicConfig(

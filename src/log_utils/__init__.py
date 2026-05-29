@@ -1,7 +1,10 @@
-from .config import setup_logging
-from .decorator import log_calls
+"""
+Setup log_utils as a package.
+"""
 
 import logging as _logging
+from .config import setup_logging
+from .decorator import log_calls
 
 # Re-export main tools for users to use:
 # from log_utils import setup_logging, log_calls

@@ -1,8 +1,13 @@
+"""
+Decorator module to use with my logger.
+"""
+
 import time
 import logging
 from functools import wraps
 
 def log_calls(func):
+    """Log when a function is entered, exited, and how long it took."""
     logger = logging.getLogger(func.__module__)
 
     @wraps(func)
@@ -14,7 +19,7 @@ def log_calls(func):
         try:
             result = func(*args, **kwargs)
             return result
-        
+
         except Exception:
             logger.debug("ERROR in %s", func.__qualname__)
             raise

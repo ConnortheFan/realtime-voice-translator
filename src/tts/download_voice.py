@@ -2,12 +2,10 @@
 Download Piper TTS voice models by language code.
 """
 
-from piper.download_voices import download_voice, list_voices
 from pathlib import Path
+from piper.download_voices import download_voice
 
 DOWNLOAD_DIR = Path("./voices")
-
-# list_voices()
 
 # All languages in 2 letter code, except en (_GB or _US), es (_AR, _ES, _MX), and nl (_BE, _NL)
 BEST_VOICES = {
@@ -292,10 +290,22 @@ REGION_PRIORITY = {
 }
 
 def download_voice_tts(lang: str, force: bool = False) -> None:
+    """
+    Download the best voice for a given language.
+
+    Will follow REGION_PRIORITY for dialect preferences for en, es, and nl.
+
+    Will download first voice found in BEST_VOICES for a given language.
+
+    Args:
+        lang (str): Language for the voice to download.
+        force (bool): Whether to forcefully redownload the voice.
+            Defaults to False.
+    """
     code = lang
-    
-    if code in REGION_PRIORITY.keys():
-        code = REGION_PRIORITY.get(code)
+
+    code = REGION_PRIORITY.get(code, code)
+    if code != lang:
         print(f"Code {lang} changed to {code}")
 
     if code is None:
@@ -305,13 +315,13 @@ def download_voice_tts(lang: str, force: bool = False) -> None:
 
     if voices is None:
         raise ValueError(f"Voice for {code} doesn't exist.")
-    
+
     DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"Downloading voice {voices[0]} for {code}")
     download_voice(
         voice=voices[0],
         download_dir=DOWNLOAD_DIR,
-        force_redownload=force
+        force_redownload=force,
     )
-    print(f"Finished download")
+    print("Finished download")

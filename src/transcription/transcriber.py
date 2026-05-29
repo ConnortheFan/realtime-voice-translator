@@ -4,14 +4,15 @@ Transcription module using the faster-whisper library.
 
 from faster_whisper import WhisperModel
 import numpy as np
-import time
 from log_utils import get_logger, log_calls
 
 class Transcriber:
     """
     Transcribe audio using the Whisper model.
 
-    This class provides an interface to use the Whisper model from the faster-whisper library to transcribe a NumPy audio array in 16 kHz mono float32 format and returns the transcribed text.
+    This class provides an interface to use the Whisper model from the 
+    faster-whisper library to transcribe a NumPy audio array in 16 kHz 
+    mono float32 format and returns the transcribed text.
 
     Also provides optional saving of transcribed text.
 
@@ -30,7 +31,9 @@ class Transcriber:
         Initialize the Whisper model.
 
         Args:
-            model_size (str): Which Whisper model to use - "tiny", "base", "small", "medium", or "large-v3". Larger models are more accurate, but slower.
+            model_size (str): Which Whisper model to use - 
+            "tiny", "base", "small", "medium", or "large-v3". 
+            Larger models are more accurate, but slower.
                 Defaults to "base" model.
             cuda (bool): If CUDA GPU is available. Otherwise, will use CPU.
                 Defaults to False.
@@ -42,15 +45,22 @@ class Transcriber:
             compute_type = "float16" # float16 is best on GPU
 
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
-    
+
     @log_calls
-    def transcribe(self, audio: np.ndarray, lang: str | None = None, save: bool = True, filename: str = "outputs/transcript.txt") -> str:
+    def transcribe(
+        self,
+        audio: np.ndarray,
+        lang: str | None = None,
+        save: bool = True,
+        filename: str = "outputs/transcript.txt",
+    ) -> str:
         """
         Transcribe and return a NumPy audio array to text. Also, optionally save transcribed text.
 
         Args:
             audio (np.ndarray): float32 array of shape (N,) or (N, 1) sampled at 16 kHz mono.
-            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing. 
+            Choose None to let Whisper auto-detect.
                 Defaults to None.
             save (bool): Whether to save transcription to files.
                 Defaults to True.
@@ -73,19 +83,27 @@ class Transcriber:
         if save:
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(transcript)
-        
-            self.logger.debug(f"Transcript saved to {filename}")
+
+            self.logger.debug("Transcript saved to %s", filename)
 
         return transcript
-    
+
     @log_calls
-    def transcribe_to_en(self, audio: np.ndarray, lang: str | None = None, save: bool = True, filename: str = "outputs/transcript_en.txt") -> str:
+    def transcribe_to_en(
+        self,
+        audio: np.ndarray,
+        lang: str | None = None,
+        save: bool = True,
+        filename: str = "outputs/transcript_en.txt",
+    ) -> str:
         """
-        Transcribe and translate a NumPy audio array to English. Returns translated text. Also, optionally save text.
+        Transcribe and translate a NumPy audio array to English.
+        Returns translated text. Also, optionally save text.
 
         Args:
             audio (np.ndarray): NumPy array of shape (N,) or (N, 1) sampled at 16 kHz mono.
-            lang (str | None): Language code (ex. "en" or "it") for transcribing. Choose None to let Whisper auto-detect.
+            lang (str | None): Language code (ex. "en" or "it") for transcribing.
+            Choose None to let Whisper auto-detect.
                 Defaults to None.
             save (bool): Whether to save transcription to files.
                 Defaults to True.
@@ -109,7 +127,7 @@ class Transcriber:
         if save:
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(transcript)
-            self.logger.debug(f"Transcript saved to {filename}")
+            self.logger.debug("Transcript saved to %s", filename)
 
         return transcript
 
