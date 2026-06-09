@@ -8,7 +8,6 @@ import wave
 
 import sounddevice as sd
 from piper import PiperVoice
-import numpy as np
 
 from log_utils import get_logger, log_calls
 from .download_voice import download_voice_tts
@@ -66,39 +65,55 @@ class TextToSpeech:
             raise ValueError("Voice Path not found")
         self.voice = PiperVoice.load(voice_path)
 
-    def speak(self, text: str, filename: str = "outputs/tts_output.wav") -> None:
+        # Output stream
+        self.stream = sd.OutputStream(
+            samplerate=self.voice.config.sample_rate,
+            channels=1,
+            dtype="int16"
+        )
+
+    def speak(
+            self,
+            text: str,
+            save: bool = True,
+            filename: str = "outputs/tts_output.wav"
+        ) -> None:
         """
         Synthesize the given text into audio and play it through the system's audio output. 
-        Also, will save audio output to files as a WAV file. 
+        Also, optionally save audio output to files as a WAV file. 
         
         Will hold program until speaking is done.
 
         Args:
             text (str): Text to speak.
+            save (bool): Whether to save tts to files.
+                Defaults to True.
             filename (str): Destination to save output audio.
                 Defaults to "outputs/tts_output.wav".
         """
         start = perf_counter()
 
-        wav_path = filename
+        wf = wave.open(filename, "wb")
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(self.voice.config.sample_rate)
 
-        wav_file = wave.Wave_write(wav_path)
-        self.voice.synthesize_wav(text, wav_file)
-
-        wav_file = wave.Wave_read(wav_path)
-        sample_rate = wav_file.getframerate()
-        frames = wav_file.readframes(wav_file.getnframes())
-        audio = np.frombuffer(frames, dtype=np.int16)
+        audio = self.voice.synthesize(text)
 
         self.logger.debug("Transforming Text-to-Speech took %.3f seconds", perf_counter() - start)
-
         start = perf_counter()
 
-        sd.play(audio, sample_rate)
-        sd.wait()
+        self.stream.start()
+        for chunk in audio:
+            self.stream.write(chunk.audio_int16_array)
+
+            if save:
+                wf.writeframes(chunk.audio_int16_bytes)
+
+        wf.close()
+        self.stream.stop()
 
         self.logger.debug("Playing audio took %.3f seconds", perf_counter() - start)
-
 
 if __name__ == "__main__":
     tts_en = TextToSpeech("en")
