@@ -4,6 +4,7 @@ Transcription module using the faster-whisper library.
 
 from faster_whisper import WhisperModel
 import numpy as np
+import torch
 from log_utils import get_logger, log_calls
 
 class Transcriber:
@@ -35,16 +36,13 @@ class Transcriber:
             "tiny", "base", "small", "medium", or "large-v3". 
             Larger models are more accurate, but slower.
                 Defaults to "base" model.
-            cuda (bool): If CUDA GPU is available. Otherwise, will use CPU.
-                Defaults to False.
         """
-        device = "cpu"
-        compute_type = "int8" # int8 is fastest on CPU
-        if cuda:
-            device = "cuda"
-            compute_type = "float16" # float16 is best on GPU
-
-        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
+        if torch.cuda.is_available():
+            self.model = WhisperModel(model_size, device="cuda", compute_type="float16")
+            self.logger.info("Using CUDA")
+        else:
+            self.model = WhisperModel(model_size, device="cpu", compute_type="int8")
+            self.logger.info("Using CPU")
 
     @log_calls
     def transcribe(
