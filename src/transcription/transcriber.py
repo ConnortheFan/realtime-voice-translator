@@ -26,7 +26,6 @@ class Transcriber:
     def __init__(
         self,
         model_size: str = "base",
-        cuda: bool = False,
     ) -> None:
         """
         Initialize the Whisper model.

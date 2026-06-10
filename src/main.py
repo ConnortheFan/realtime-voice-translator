@@ -6,11 +6,13 @@ python src/main.py
 to start.
 """
 
+from concurrent.futures import ThreadPoolExecutor
+
 from capture.recorder import Recorder
 from transcription.transcriber import Transcriber
 from translation.translator import Translator
 from tts.tts import TextToSpeech
-from log_utils import setup_logging, log_calls
+from log_utils import setup_logging, log_calls, get_logger
 from core import AppState, KeyboardHandler
 
 @log_calls
@@ -22,17 +24,28 @@ def main():
 
     to start.
     """
-    setup_logging(debug = False)
+    setup_logging(debug = True)
+
+    logger = get_logger(__name__)
 
     state = AppState()
     KeyboardHandler(state).start()
     recorder = Recorder()
-    transcriber = Transcriber()
-    translator = Translator("it", "en")
-    tts_it = TextToSpeech("it")
-    tts_en = TextToSpeech("en")
 
-    print("All modules initialized, program running")
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        futures = {
+            "transcriber": ex.submit(Transcriber),
+            "translator": ex.submit(Translator, "it", "en"),
+            "tts_it": ex.submit(TextToSpeech, "it"),
+            "tts_en": ex.submit(TextToSpeech, "en"),
+        }
+
+        transcriber = futures['transcriber'].result()
+        translator = futures['translator'].result()
+        tts_it = futures['tts_it'].result()
+        tts_en = futures['tts_en'].result()
+
+    logger.debug("All modules initialized, program running")
     print("Press ENTER to transcribe Italian to English")
     print("Hold SPACE to talk")
     print("Press ESC to quit")
