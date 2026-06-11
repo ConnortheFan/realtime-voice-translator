@@ -34,9 +34,10 @@ def main():
     print("Hold SPACE to talk")
     print("Press ESC to quit")
 
-    recorder = modules.get_module("recorder")
+    recorder: Recorder = modules.get_module("recorder")
     recorder.start()
 
+    print(modules.status())
     while state.running:
         # You speaking via push-to-talk SPACE bar
         if state.push_to_talk and not state.push_to_talk_processing:
@@ -52,13 +53,13 @@ def main():
             transcriber: Transcriber = modules.get_module("transcriber")
             transcription = transcriber.transcribe(recording_audio, lang="en")
 
-            translator = modules.get_module("translator")
+            translator: Translator = modules.get_module("translator")
             translation = translator.translate_ba(transcription)
 
             print(translation)
             print("Speaking started")
 
-            tts_it = modules.get_module("tts_it")
+            tts_it: TextToSpeech = modules.get_module("tts_it")
             tts_it.speak(translation)
 
             print("Speaking stopped")
@@ -70,13 +71,13 @@ def main():
             state.transcribe_to_en_processing = True
             recording_audio_en = recorder.get_audio()
 
-            transcriber = modules.get_module("transcriber")
+            transcriber: Transcriber = modules.get_module("transcriber")
             transcription_en = transcriber.transcribe_to_en(recording_audio_en, "it")
             print(transcription_en)
 
             print("Speaking started")
 
-            tts_en = modules.get_module("tts_en")
+            tts_en: TextToSpeech = modules.get_module("tts_en")
             tts_en.speak(transcription_en)
             print("Speaking stopped")
         elif state.transcribe_to_en_processing and not state.transcribe_to_en:
@@ -85,6 +86,7 @@ def main():
             recorder.clear_audio()
 
     recorder.stop()
+    print(modules.status())
 
 if __name__ == "__main__":
     main()

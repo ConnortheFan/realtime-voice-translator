@@ -11,6 +11,9 @@ from tts.tts import TextToSpeech
 from log_utils import log_calls, get_logger
 
 class Modules:
+    """
+    Container to initialize and store modules for instantaneous startup.
+    """
     logger = get_logger(__name__)
 
     def __init__(self):
@@ -28,7 +31,8 @@ class Modules:
     @log_calls
     def get_module(self, module: str):
         """
-        Retrieves a module from initialization. If the module has already been retrieved before, stores it in cache for instantaneous retrieval.
+        Retrieves a module from initialization. If the module has 
+        already been retrieved before, stores it in cache for instantaneous retrieval.
 
         Args:
             module (str): Name of module.
@@ -38,6 +42,20 @@ class Modules:
             raise ValueError(f"Module {module} not found")
 
         if module not in self.cache:
-            self.cache[module] = self.futures[module].result()
+            self.cache[module] = self.futures.pop(module).result()
 
         return self.cache[module]
+
+    def status(self) -> dict[str, str]:
+        """
+        Returns initialization state of all modules.
+        """
+        return {
+            name: (
+                "ready" if name in self.cache
+                else "initialized" if self.futures[name].done()
+                else "pending" if name in self.futures
+                else "unknown"
+            )
+            for name in self.futures.keys() | self.cache.keys()
+        }
