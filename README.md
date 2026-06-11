@@ -20,6 +20,7 @@ This project is being developed as both:
 - [x] Bidirectional conversation mode
 
 ### Planned
+- [ ] Automatic translation via VAD
 - [ ] Continuous streaming translation
 - [ ] Reduced latency pipeline
 - [ ] Multiple language support
@@ -47,18 +48,32 @@ This project is being developed as both:
 realtime-voice-translator/
 │
 ├── scripts/
-|   └── install_languages.py
-|
+│   └── install_languages.py
+│
 ├── src/
 │   ├── capture/
-|   |   └── recorder.py
+│   │   └── recorder.py
+│   │
+│   ├── core/
+│   │   ├── app.py
+│   │   ├── keyboard.py
+│   │   ├── modules.py
+│   │   └── state.py
+│   │
+│   ├── log_utils/
+│   │   ├── config.py
+│   │   └── decorator.py
+│   │
 │   ├── transcription/
-|   |   └── transcriber.py
+│   │   └── transcriber.py
+│   │
 │   ├── translation/
-|   |   └── translator.py
+│   │   └── translator.py
+│   │
 │   ├── tts/
-|   |   ├── download_voice.py
-|   |   └── tts.py
+│   │   ├── download_voice.py
+│   │   └── tts.py
+│   │
 │   └── main.py
 │
 ├── requirements.txt
@@ -178,7 +193,7 @@ This project is intended to help develop experience with:
 - [x] Add speech playback
 
 ### Phase 3
-- [ ] Improve responsiveness
+- [x] Improve responsiveness
 - [ ] Add streaming support
 
 ### Phase 4
