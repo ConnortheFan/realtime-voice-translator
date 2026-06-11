@@ -20,7 +20,7 @@ import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
-from src.tts.download_voice import download_voice_tts
+from tts import download_voice_tts
 
 from itertools import permutations
 

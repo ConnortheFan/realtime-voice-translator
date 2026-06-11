@@ -2,10 +2,10 @@
 Realtime Voice Translator App logic.
 """
 # pylint: disable=too-few-public-methods
-from capture.recorder import Recorder
-from transcription.transcriber import Transcriber
-from translation.translator import Translator
-from tts.tts import TextToSpeech
+from capture import Recorder
+from transcription import Transcriber
+from translation import Translator
+from tts import TextToSpeech
 from log_utils import log_calls, get_logger
 from .state import AppState
 from .keyboard import KeyboardHandler
