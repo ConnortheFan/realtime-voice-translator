@@ -5,15 +5,12 @@ python src/main.py
 
 to start.
 """
-
-from concurrent.futures import ThreadPoolExecutor
-
 from capture.recorder import Recorder
 from transcription.transcriber import Transcriber
 from translation.translator import Translator
 from tts.tts import TextToSpeech
 from log_utils import setup_logging, log_calls, get_logger
-from core import AppState, KeyboardHandler
+from core import AppState, KeyboardHandler, Modules
 
 @log_calls
 def main():
@@ -30,20 +27,7 @@ def main():
 
     state = AppState()
     KeyboardHandler(state).start()
-    recorder = Recorder()
-
-    with ThreadPoolExecutor(max_workers=4) as ex:
-        futures = {
-            "transcriber": ex.submit(Transcriber),
-            "translator": ex.submit(Translator, "it", "en"),
-            "tts_it": ex.submit(TextToSpeech, "it"),
-            "tts_en": ex.submit(TextToSpeech, "en"),
-        }
-
-        transcriber = futures['transcriber'].result()
-        translator = futures['translator'].result()
-        tts_it = futures['tts_it'].result()
-        tts_en = futures['tts_en'].result()
+    modules = Modules()
 
     logger.debug("All modules initialized, program running")
     print("Press ENTER to transcribe Italian to English")
@@ -53,6 +37,7 @@ def main():
     started = False
     transcribing = False
 
+    recorder = modules.get_module("recorder")
     recorder.start()
 
     while state.running:
@@ -66,11 +51,19 @@ def main():
             print("Recording stopped")
 
             recording_audio = recorder.get_audio()
-            transcription = transcriber.transcribe(recording_audio)
+
+            transcriber: Transcriber = modules.get_module("transcriber")
+            transcription = transcriber.transcribe(recording_audio, lang="en")
+
+            translator = modules.get_module("translator")
             translation = translator.translate_ba(transcription)
+
             print(translation)
             print("Speaking started")
+
+            tts_it = modules.get_module("tts_it")
             tts_it.speak(translation)
+
             print("Speaking stopped")
             recorder.clear_audio()
         # Someone else speaking Italian
@@ -78,9 +71,14 @@ def main():
             print("Transcribing to English")
             transcribing = True
             recording_audio_en = recorder.get_audio()
+
+            transcriber = modules.get_module("transcriber")
             transcription_en = transcriber.transcribe_to_en(recording_audio_en, "it")
             print(transcription_en)
+
             print("Speaking started")
+
+            tts_en = modules.get_module("tts_en")
             tts_en.speak(transcription_en)
             print("Speaking stopped")
         elif transcribing and not state.transcribe_to_en:

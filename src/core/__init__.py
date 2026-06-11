@@ -2,5 +2,6 @@
 
 from .state import AppState
 from .keyboard import KeyboardHandler
+from .modules import Modules
 
-__all__ = ["AppState", "KeyboardHandler"]
+__all__ = ["AppState", "KeyboardHandler", "Modules"]
