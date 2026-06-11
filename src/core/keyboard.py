@@ -20,7 +20,7 @@ class KeyboardHandler:
     def _on_press(self, key):
         """Determine behavior when certain keys are pressed."""
         if key == keyboard.Key.space:
-            self.state.recording = True
+            self.state.push_to_talk = True
         elif key == keyboard.Key.enter:
             self.state.transcribe_to_en = True
         elif key == keyboard.Key.esc:
@@ -30,7 +30,7 @@ class KeyboardHandler:
     def _on_release(self, key):
         """Determine behavior when certain keys are released."""
         if key == keyboard.Key.space:
-            self.state.recording = False
+            self.state.push_to_talk = False
         elif key == keyboard.Key.enter:
             self.state.transcribe_to_en = False
 

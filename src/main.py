@@ -34,20 +34,17 @@ def main():
     print("Hold SPACE to talk")
     print("Press ESC to quit")
 
-    started = False
-    transcribing = False
-
     recorder = modules.get_module("recorder")
     recorder.start()
 
     while state.running:
         # You speaking via push-to-talk SPACE bar
-        if state.recording and not started:
-            started = True
+        if state.push_to_talk and not state.push_to_talk_processing:
+            state.push_to_talk_processing = True
             print("\nRecording started")
             recorder.clear_audio()
-        elif not state.recording and started:
-            started = False
+        elif not state.push_to_talk and state.push_to_talk_processing:
+            state.push_to_talk_processing = False
             print("Recording stopped")
 
             recording_audio = recorder.get_audio()
@@ -66,10 +63,11 @@ def main():
 
             print("Speaking stopped")
             recorder.clear_audio()
+
         # Someone else speaking Italian
-        elif state.transcribe_to_en and not transcribing:
+        elif state.transcribe_to_en and not state.transcribe_to_en_processing:
             print("Transcribing to English")
-            transcribing = True
+            state.transcribe_to_en_processing = True
             recording_audio_en = recorder.get_audio()
 
             transcriber = modules.get_module("transcriber")
@@ -81,8 +79,8 @@ def main():
             tts_en = modules.get_module("tts_en")
             tts_en.speak(transcription_en)
             print("Speaking stopped")
-        elif transcribing and not state.transcribe_to_en:
-            transcribing = False
+        elif state.transcribe_to_en_processing and not state.transcribe_to_en:
+            state.transcribe_to_en_processing = False
             print("Done transcribing")
             recorder.clear_audio()
 
